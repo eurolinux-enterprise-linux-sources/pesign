@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.109
-Release: 4%{?dist}
+Release: 6%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -21,6 +21,7 @@ Source1: rh-test-certs.tar.bz2
 Patch0001: 0001-Use-the-right-signing-method-on-the-RHEL-signing-mac.patch
 Patch0002: 0001-Fix-error-detected-by-coverity.patch
 Patch0003: 0001-One-more-tweak-for-RHEL-signing-rules.patch
+Patch0004: 0001-Changes-to-make-sure-we-inherit-CFLAGS-properly-from.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -36,7 +37,7 @@ git commit -a -q -m "%{version} baseline."
 git am %{patches} </dev/null
 
 %build
-make PREFIX=%{_prefix} LIBDIR=%{_libdir}
+make CFLAGS="%{optflags}" PREFIX=%{_prefix} LIBDIR=%{_libdir}
 
 %install
 rm -rf %{buildroot}
@@ -100,6 +101,13 @@ exit 0
 %endif
 
 %changelog
+* Thu Mar 20 2014 Peter Jones <pjones@redhat.com> - 0.109-6
+- Make sure CFLAGS is inherited properly for -fstack-protector-strong.
+  Resolves: rhbz#1070782
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 0.109-5
+- Mass rebuild 2013-12-27
+
 * Tue Oct 29 2013 Peter Jones <pjones@redhat.com> - 0.109-4
 - Tweak the signing rules just a bit more.
   Related: rhbz1017857
