@@ -1,7 +1,7 @@
-From 44d896bec9124d42e2ca2035e46599c446640ba3 Mon Sep 17 00:00:00 2001
+From d895607d9575600e6bbc13724caa704982540f8d Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 29 Oct 2013 11:27:31 -0400
-Subject: [PATCH] One more tweak for RHEL signing rules.
+Subject: [PATCH 03/15] One more tweak for RHEL signing rules.
 
 It never ends.
 
@@ -24,5 +24,5 @@ index 143ef8e..7faa4a1 100644
        echo > ${nss}/pwfile						\
        certutil -N -d ${nss} -f ${nss}/pwfile				\
 -- 
-1.8.3.1
+2.5.5
 

@@ -1,0 +1,98 @@
+From f1212565b3783564a50f98a652588091a6680908 Mon Sep 17 00:00:00 2001
+From: Pat Riehecky <riehecky@fnal.gov>
+Date: Fri, 12 Sep 2014 09:37:07 -0500
+Subject: [PATCH 08/15] A more plugable way of setting ACLs for pesign
+
+The sysvinit script provided with pesign sets ACLS for the pesign/socket
+file for kojibuilder:kojibuilder.  The systemd unit, however, does not.
+
+I've built a more general solution for both the sysvinit and systemd
+unit that should allow for greater flexibility and compat behavior.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+(cherry picked from commit 3c2374b57f26f15efa7c883e0fbbbaf3c490d074)
+---
+ src/pesign-authorize-groups | 17 +++++++++++++++++
+ src/pesign-authorize-users  | 17 +++++++++++++++++
+ src/pesign.service          |  2 ++
+ src/pesign.sysvinit         |  6 ++----
+ 4 files changed, 38 insertions(+), 4 deletions(-)
+ create mode 100644 src/pesign-authorize-groups
+ create mode 100644 src/pesign-authorize-users
+
+diff --git a/src/pesign-authorize-groups b/src/pesign-authorize-groups
+new file mode 100644
+index 0000000..1048904
+--- /dev/null
++++ b/src/pesign-authorize-groups
+@@ -0,0 +1,17 @@
++#!/bin/bash
++
++#
++# With /run/pesign/socket on tmpfs, a simple way of restoring the
++# acls for specific groups is useful
++#
++#  Compare to: http://infrastructure.fedoraproject.org/cgit/ansible.git/tree/roles/bkernel/tasks/main.yml?id=17198dadebf59d8090b7ed621bc8ab22152d2eb6
++#
++
++# License: GPLv2
++
++if [[ -r /etc/pesign/authorize-groups ]]; then
++    for group in $(cat /etc/pesign/authorize-groups); do
++        setfacl -m g:${group}:rx /var/run/pesign
++        setfacl -m g:${group}:rw /var/run/pesign/socket
++    done
++fi
+diff --git a/src/pesign-authorize-users b/src/pesign-authorize-users
+new file mode 100644
+index 0000000..1993570
+--- /dev/null
++++ b/src/pesign-authorize-users
+@@ -0,0 +1,17 @@
++#!/bin/bash
++
++#
++# With /run/pesign/socket on tmpfs, a simple way of restoring the
++# acls for specific users is useful
++#
++#  Compare to: http://infrastructure.fedoraproject.org/cgit/ansible.git/tree/roles/bkernel/tasks/main.yml?id=17198dadebf59d8090b7ed621bc8ab22152d2eb6
++#
++
++# License: GPLv2
++
++if [[ -r /etc/pesign/authorize-users ]]; then
++    for username in $(cat /etc/pesign/authorize-users); do
++        setfacl -m u:${username}:rx /var/run/pesign
++        setfacl -m u:${username}:rw /var/run/pesign/socket
++    done
++fi
+diff --git a/src/pesign.service b/src/pesign.service
+index 75a73c3..d6a412e 100644
+--- a/src/pesign.service
++++ b/src/pesign.service
+@@ -6,3 +6,5 @@ PrivateTmp=true
+ Type=forking
+ PIDFile=/var/run/pesign.pid
+ ExecStart=/usr/bin/pesign --daemonize
++ExecStartPost=/usr/sbin/pesign-authorize-users
++ExecStartPost=/usr/sbin/pesign-authorize-groups
+diff --git a/src/pesign.sysvinit b/src/pesign.sysvinit
+index ea37c58..6f20560 100644
+--- a/src/pesign.sysvinit
++++ b/src/pesign.sysvinit
+@@ -24,10 +24,8 @@ start(){
+     RETVAL=$?
+     echo
+     touch /var/lock/subsys/pesign
+-    setfacl -m u:kojibuilder:x /var/run/pesign
+-    setfacl -m u:kojibuilder:rw /var/run/pesign/socket
+-    setfacl -m g:kojibuilder:x /var/run/pesign
+-    setfacl -m g:kojibuilder:rw /var/run/pesign/socket
++    /usr/sbin/pesign-authorize-users
++    /usr/sbin/pesign-authorize-groups
+ }
+ 
+ stop(){
+-- 
+2.5.5
+

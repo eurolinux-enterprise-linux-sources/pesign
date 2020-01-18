@@ -1,7 +1,7 @@
-From c40c25a50563c6d3a669475b9b6ff954706c98b1 Mon Sep 17 00:00:00 2001
+From 1d2859fa0e9cad7e0f36fef6ff17b91e10902777 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 2 Sep 2014 11:08:23 -0400
-Subject: [PATCH] Build as PIE+RELRO binaries.
+Subject: [PATCH 06/15] Build as PIE+RELRO binaries.
 
 Resolves: rhbz#1092542
 
@@ -55,5 +55,5 @@ index e45d2a3..766ffe8 100644
  TARGETS = pesign authvar client efisiglist efikeygen peverify
  
 -- 
-1.9.3
+2.5.5
 

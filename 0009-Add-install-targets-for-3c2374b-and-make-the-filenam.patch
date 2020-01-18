@@ -1,0 +1,66 @@
+From fc08bd9a51b4bf576f7d6c1df6fb3f3d8dba26c1 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 9 Jun 2015 16:00:00 -0400
+Subject: [PATCH 09/15] Add "install" targets for 3c2374b and make the
+ filenames a little nicer.
+
+Related: rhbz#1141263
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+(cherry picked from commit 95195477dac72d4fcc09726314da4a8dd3552d49)
+---
+ src/Makefile                | 6 ++++++
+ src/pesign-authorize-groups | 4 ++--
+ src/pesign-authorize-users  | 4 ++--
+ 3 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index 766ffe8..6b1e582 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -72,6 +72,12 @@ install_systemd:
+ 	$(INSTALL) -m 644 tmpfiles.conf $(INSTALLROOT)/usr/lib/tmpfiles.d/pesign.conf
+ 	$(INSTALL) -d -m 755 $(INSTALLROOT)/usr/lib/systemd/system/
+ 	$(INSTALL) -m 644 pesign.service $(INSTALLROOT)/usr/lib/systemd/system/
++	$(INSTALL) -d -m 755 $(INSTALLROOT)$(PREFIX)/sbin/
++	$(INSTALL) -m 755 pesign-authorize-users $(INSTALLROOT)$(PREFIX)/sbin/pesign-authorize-users
++	$(INSTALL) -m 755 pesign-authorize-groups $(INSTALLROOT)$(PREFIX)/sbin/pesign-authorize-groups
++	$(INSTALL) -d -m 700 $(INSTALLROOT)/etc/pesign
++	$(INSTALL) -m 600 /dev/null $(INSTALLROOT)/etc/pesign/users
++	$(INSTALL) -m 600 /dev/null $(INSTALLROOT)/etc/pesign/groups
+ 
+ install_sysvinit:
+ 	$(INSTALL) -d -m 755 $(INSTALLROOT)/etc/rc.d/init.d/
+diff --git a/src/pesign-authorize-groups b/src/pesign-authorize-groups
+index 1048904..e3864ce 100644
+--- a/src/pesign-authorize-groups
++++ b/src/pesign-authorize-groups
+@@ -9,8 +9,8 @@
+ 
+ # License: GPLv2
+ 
+-if [[ -r /etc/pesign/authorize-groups ]]; then
+-    for group in $(cat /etc/pesign/authorize-groups); do
++if [[ -r /etc/pesign/groups ]]; then
++    for group in $(cat /etc/pesign/groups); do
+         setfacl -m g:${group}:rx /var/run/pesign
+         setfacl -m g:${group}:rw /var/run/pesign/socket
+     done
+diff --git a/src/pesign-authorize-users b/src/pesign-authorize-users
+index 1993570..e500204 100644
+--- a/src/pesign-authorize-users
++++ b/src/pesign-authorize-users
+@@ -9,8 +9,8 @@
+ 
+ # License: GPLv2
+ 
+-if [[ -r /etc/pesign/authorize-users ]]; then
+-    for username in $(cat /etc/pesign/authorize-users); do
++if [[ -r /etc/pesign/users ]]; then
++    for username in $(cat /etc/pesign/users); do
+         setfacl -m u:${username}:rx /var/run/pesign
+         setfacl -m u:${username}:rw /var/run/pesign/socket
+     done
+-- 
+2.5.5
+

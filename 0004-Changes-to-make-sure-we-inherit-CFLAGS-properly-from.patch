@@ -1,7 +1,7 @@
-From f209086af1f0e11b41fdfb24a64bd6fdc4420b2a Mon Sep 17 00:00:00 2001
+From b328f6ede664d5c37ecbd957355a991862191ff9 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 18 Mar 2014 11:41:18 -0400
-Subject: [PATCH] Changes to make sure we inherit CFLAGS properly from
+Subject: [PATCH 04/15] Changes to make sure we inherit CFLAGS properly from
  rpmbuild.
 
 This makes sure we build with -fstack-protector-strong when invoked
@@ -9,14 +9,14 @@ correctly with it in CFLAGS="" from make.
 
 Signed-off-by: Peter Jones <pesign-owner@fedoraproject.org>
 ---
- Make.defaults                          |   7 ++++---
- Make.efirules                          |   6 +++---
- Make.rules                             |  10 +++++-----
- libdpe/pe_allocspace.c                 |   1 +
- src/Makefile                           |   2 +-
- src/efikeygen.c                        |   2 +-
- util/Makefile                          |   2 +-
- 10 files changed, 16 insertions(+), 14 deletions(-)
+ Make.defaults          |  7 ++++---
+ Make.efirules          |  6 +++---
+ Make.rules             | 10 +++++-----
+ libdpe/pe_allocspace.c |  1 +
+ src/Makefile           |  2 +-
+ src/efikeygen.c        |  2 +-
+ util/Makefile          |  2 +-
+ 7 files changed, 16 insertions(+), 14 deletions(-)
 
 diff --git a/Make.defaults b/Make.defaults
 index e2c967b..0995e5b 100644
@@ -148,5 +148,5 @@ index 1cf782c..ff11cb8 100644
  TARGETS = setupsb.efi dumpsb.efi clearpk.efi
  
 -- 
-1.8.5.3
+2.5.5
 

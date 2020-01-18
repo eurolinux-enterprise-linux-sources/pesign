@@ -1,7 +1,7 @@
-From b6572d6ed9c1a1d9b5584ee4307067d9264ca5da Mon Sep 17 00:00:00 2001
+From abc2125fad51b2a3889248412ecc654c38d2efbb Mon Sep 17 00:00:00 2001
 From: "d.marlin" <dmarlin@redhat.com>
 Date: Wed, 27 Aug 2014 16:26:45 -0400
-Subject: [PATCH] Allow aarch64 in the rhel build macros.
+Subject: [PATCH 05/15] Allow aarch64 in the rhel build macros.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -24,5 +24,5 @@ index 7faa4a1..39374ce 100644
        nss=$(mktemp -p $PWD -d)						\
        echo > ${nss}/pwfile						\
 -- 
-1.9.3
+2.5.5
 

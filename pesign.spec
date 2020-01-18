@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.109
-Release: 9%{?dist}
+Release: 10%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -19,12 +19,20 @@ ExclusiveArch: x86_64 aarch64
 Source0: pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
 Patch0001: 0001-Use-the-right-signing-method-on-the-RHEL-signing-mac.patch
-Patch0002: 0001-Fix-error-detected-by-coverity.patch
-Patch0003: 0001-One-more-tweak-for-RHEL-signing-rules.patch
-Patch0004: 0001-Changes-to-make-sure-we-inherit-CFLAGS-properly-from.patch
-Patch0005: 0001-Allow-aarch64-in-the-rhel-build-macros.patch
-Patch0006: 0001-Build-as-PIE-RELRO-binaries.patch
-Patch0007: 0001-Fix-some-man-page-errors.patch
+Patch0002: 0002-Fix-error-detected-by-coverity.patch
+Patch0003: 0003-One-more-tweak-for-RHEL-signing-rules.patch
+Patch0004: 0004-Changes-to-make-sure-we-inherit-CFLAGS-properly-from.patch
+Patch0005: 0005-Allow-aarch64-in-the-rhel-build-macros.patch
+Patch0006: 0006-Build-as-PIE-RELRO-binaries.patch
+Patch0007: 0007-Fix-some-man-page-errors.patch
+Patch0008: 0008-A-more-plugable-way-of-setting-ACLs-for-pesign.patch
+Patch0009: 0009-Add-install-targets-for-3c2374b-and-make-the-filenam.patch
+Patch0010: 0010-setfacl-the-nss-DBs-to-our-authorized-users-not-just.patch
+Patch0011: 0011-Don-t-setfacl-when-the-socket-or-dir-aren-t-there.patch
+Patch0012: 0012-setfacl-the-db-as-well.patch
+Patch0013: 0013-Improve-our-setfacl-scripts-for-database-and-socket-.patch
+Patch0014: 0014-Make-pesign-authorize-users-groups-not-be-in-sbin.patch
+Patch0015: 0015-Actually-setfacl-each-directory-of-our-key-storage.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -92,6 +100,10 @@ exit 0
 %{_bindir}/efikeygen
 %{_sysconfdir}/popt.d/pesign.popt
 %{_sysconfdir}/rpm/macros.pesign
+%{_libexecdir}/pesign/pesign-authorize-users
+%{_libexecdir}/pesign/pesign-authorize-groups
+%config(noreplace)/%{_sysconfdir}/pesign/users
+%config(noreplace)/%{_sysconfdir}/pesign/groups
 %{_mandir}/man*/*
 %dir %attr(0775,pesign,pesign) /etc/pki/pesign
 %attr(0664,pesign,pesign) /etc/pki/pesign/*
@@ -104,6 +116,10 @@ exit 0
 %endif
 
 %changelog
+* Mon May 16 2016 Peter Jones <pjones@redhat.com> - - 0.109-10
+- Add support for /etc/pesign/users and /etc/pesign/groups
+  Resolves: rhbz#1141263
+
 * Tue Sep 02 2014 Peter Jones <pjones@redhat.com> - 0.109-9
 - Fix man page errors.
   Resolves: rhbz#948850

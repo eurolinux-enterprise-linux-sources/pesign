@@ -1,0 +1,124 @@
+From 0c973c36bf25a863db868d518265b5e7ee722764 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 10 Jun 2015 14:56:38 -0400
+Subject: [PATCH 14/15] Make pesign-authorize-{users,groups} not be in sbin.
+
+If it's in sbin, it needs a man page.  On fedora/rhel it should go in
+libexec, on debian probably /usr/share someplace.  This change puts it
+in libexec and makes it so you can put that wherever you like by doing:
+
+make libexecdir=/usr/share all
+make libexecdir=/usr/share install install_systemd
+
+or similar.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+(cherry picked from commit 8854461314f1d908dfb3e46a1654b731709df309)
+---
+ Make.defaults                               |  3 ++-
+ src/Makefile                                | 16 ++++++++++------
+ src/{pesign.service => pesign.service.in}   |  4 ++--
+ src/{pesign.sysvinit => pesign.sysvinit.in} |  4 ++--
+ 4 files changed, 16 insertions(+), 11 deletions(-)
+ rename src/{pesign.service => pesign.service.in} (55%)
+ rename src/{pesign.sysvinit => pesign.sysvinit.in} (92%)
+
+diff --git a/Make.defaults b/Make.defaults
+index 5ff74ee..125487e 100644
+--- a/Make.defaults
++++ b/Make.defaults
+@@ -12,7 +12,8 @@ LDFLAGS	   = -nostdlib
+ CCLDFLAGS  = -shared
+ INSTALL	   = install
+ # XXX this is broken
+-bindir     = /usr/bin/
++bindir     = $(PREFIX)/bin/
++libexecdir = $(PREFIX)/libexec
+ 
+ CC            = $(bindir)gcc
+ AS            = $(bindir)as
+diff --git a/src/Makefile b/src/Makefile
+index 6b1e582..41a622f 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -10,7 +10,8 @@ LDFLAGS =
+ CCLDFLAGS = -L../libdpe $(foreach pklib,$(PKLIBS), $(shell pkg-config --libs-only-L $(pklib))) -pie -fPIE -Wl,-z,relro,-z,now
+ BUILDFLAGS += -I../include/ $(foreach pklib,$(PKLIBS), $(shell pkg-config --cflags $(pklib))) -Werror -fPIE
+ 
+-TARGETS = pesign authvar client efisiglist efikeygen peverify
++TARGETS = pesign authvar client efisiglist efikeygen peverify \
++	pesign.service pesign.sysvinit
+ 
+ all : $(TARGETS)
+ 
+@@ -57,6 +58,9 @@ fuzzsocket : $(fuzzsocket_OBJECTS) -lrt
+ DEPS = $(generic_DEPS) $(authvar_DEPS) $(pesign_DEPS) $(client_DEPS) \
+ 	$(peverify_DEPS) $(efisiglist_DEPS) $(efikeygen_DEPS)
+ 
++pesign.sysvinit pesign.service : % : %.in
++	sed -e "s,@@LIBEXECDIR@@,$(libexecdir),g" $< > $@
++
+ deps : $(DEPS)
+ 
+ depclean :
+@@ -67,19 +71,19 @@ depclean :
+ clean : depclean
+ 	@rm -rfv *.o *.a *.so $(TARGETS)
+ 
+-install_systemd:
++install_systemd: pesign.service
+ 	$(INSTALL) -d -m 755 $(INSTALLROOT)/usr/lib/tmpfiles.d/
+ 	$(INSTALL) -m 644 tmpfiles.conf $(INSTALLROOT)/usr/lib/tmpfiles.d/pesign.conf
+ 	$(INSTALL) -d -m 755 $(INSTALLROOT)/usr/lib/systemd/system/
+ 	$(INSTALL) -m 644 pesign.service $(INSTALLROOT)/usr/lib/systemd/system/
+-	$(INSTALL) -d -m 755 $(INSTALLROOT)$(PREFIX)/sbin/
+-	$(INSTALL) -m 755 pesign-authorize-users $(INSTALLROOT)$(PREFIX)/sbin/pesign-authorize-users
+-	$(INSTALL) -m 755 pesign-authorize-groups $(INSTALLROOT)$(PREFIX)/sbin/pesign-authorize-groups
++	$(INSTALL) -d -m 755 $(INSTALLROOT)$(libexecdir)/pesign/
++	$(INSTALL) -m 755 pesign-authorize-users $(INSTALLROOT)$(libexecdir)/pesign/pesign-authorize-users
++	$(INSTALL) -m 755 pesign-authorize-groups $(INSTALLROOT)$(libexecdir)/pesign/pesign-authorize-groups
+ 	$(INSTALL) -d -m 700 $(INSTALLROOT)/etc/pesign
+ 	$(INSTALL) -m 600 /dev/null $(INSTALLROOT)/etc/pesign/users
+ 	$(INSTALL) -m 600 /dev/null $(INSTALLROOT)/etc/pesign/groups
+ 
+-install_sysvinit:
++install_sysvinit: pesign.sysvinit
+ 	$(INSTALL) -d -m 755 $(INSTALLROOT)/etc/rc.d/init.d/
+ 	$(INSTALL) -m 755 pesign.sysvinit $(INSTALLROOT)/etc/rc.d/init.d/pesign
+ 
+diff --git a/src/pesign.service b/src/pesign.service.in
+similarity index 55%
+rename from src/pesign.service
+rename to src/pesign.service.in
+index d6a412e..aaa408e 100644
+--- a/src/pesign.service
++++ b/src/pesign.service.in
+@@ -6,5 +6,5 @@ PrivateTmp=true
+ Type=forking
+ PIDFile=/var/run/pesign.pid
+ ExecStart=/usr/bin/pesign --daemonize
+-ExecStartPost=/usr/sbin/pesign-authorize-users
+-ExecStartPost=/usr/sbin/pesign-authorize-groups
++ExecStartPost=@@LIBEXECDIR@@/pesign/pesign-authorize-users
++ExecStartPost=@@LIBEXECDIR@@/pesign/pesign-authorize-groups
+diff --git a/src/pesign.sysvinit b/src/pesign.sysvinit.in
+similarity index 92%
+rename from src/pesign.sysvinit
+rename to src/pesign.sysvinit.in
+index 6f20560..d8fffca 100644
+--- a/src/pesign.sysvinit
++++ b/src/pesign.sysvinit.in
+@@ -24,8 +24,8 @@ start(){
+     RETVAL=$?
+     echo
+     touch /var/lock/subsys/pesign
+-    /usr/sbin/pesign-authorize-users
+-    /usr/sbin/pesign-authorize-groups
++    @@LIBEXECDIR@@/pesign/pesign-authorize-users
++    @@LIBEXECDIR@@/pesign/pesign-authorize-groups
+ }
+ 
+ stop(){
+-- 
+2.5.5
+
