@@ -1,7 +1,7 @@
-From cca5baa1797e5cee78a32ba444c0327bd316d7b1 Mon Sep 17 00:00:00 2001
+From 8beb32309aec95f1e367553bf5fa3e0a1ddf547d Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Fri, 25 Oct 2013 10:08:32 -0400
-Subject: [PATCH 02/15] Fix error detected by coverity.
+Subject: [PATCH] Fix error detected by coverity.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -22,5 +22,5 @@ index ca097e6..2080b98 100644
  	memcpy(sd->SignatureData, sig, sl->SignatureSize -
  						sizeof (efi_guid_t));
 -- 
-2.5.5
+1.8.3.1
 

@@ -1,7 +1,7 @@
-From c889e85273814fe0290d1fdd280e93214133d7c0 Mon Sep 17 00:00:00 2001
+From 776e724687ebc2958ac6c78cd30e9d8b6a0c6eec Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 24 Oct 2013 15:22:13 -0400
-Subject: [PATCH 01/15] Use the right signing method on the RHEL signing macro.
+Subject: [PATCH] Use the right signing method on the RHEL signing macro.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -22,5 +22,5 @@ index 7f6e6ef..143ef8e 100644
                   --certdir ${nss} -c signer %{-o}			\
        rm -rf ${sattrs} ${sattrs}.sig ${nss}				\
 -- 
-2.5.5
+1.8.3.1
 
