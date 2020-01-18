@@ -1,0 +1,26 @@
+From 8beb32309aec95f1e367553bf5fa3e0a1ddf547d Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 25 Oct 2013 10:08:32 -0400
+Subject: [PATCH] Fix error detected by coverity.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/siglist.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/siglist.c b/src/siglist.c
+index ca097e6..2080b98 100644
+--- a/src/siglist.c
++++ b/src/siglist.c
+@@ -147,6 +147,8 @@ signature_list_add_sig(signature_list *sl, efi_guid_t owner,
+ 	}
+ 
+ 	struct efi_signature_data *sd = calloc(1, sl->SignatureSize);
++	if (!sd)
++		return -1;
+ 	memcpy(&sd->SignatureOwner, &owner, sizeof (owner));
+ 	memcpy(sd->SignatureData, sig, sl->SignatureSize -
+ 						sizeof (efi_guid_t));
+-- 
+1.8.3.1
+

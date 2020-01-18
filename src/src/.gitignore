@@ -1,0 +1,15 @@
+*~
+*.o
+*.so
+*.a
+*.efi
+.*.P
+pesign
+authvar
+*.sw?
+core.*
+ms
+client
+efikeygen
+efisiglist
+peverify

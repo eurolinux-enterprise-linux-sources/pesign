@@ -1,0 +1,95 @@
+From d5eb3d4a1e4eff14ef99aac1e805c06a1dafad2c Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 2 Sep 2014 11:27:58 -0400
+Subject: [PATCH] Fix some man page errors.
+
+Resolves: rhbz#948850
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/pesign-client.1 |  6 +++---
+ src/pesign.1        | 17 ++++++++++++++---
+ 2 files changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/src/pesign-client.1 b/src/pesign-client.1
+index bca4e88..e00c887 100644
+--- a/src/pesign-client.1
++++ b/src/pesign-client.1
+@@ -42,15 +42,15 @@ When using \fB-\-unlock\fR, read the token's PIN from the file \fIpinfile\fR.
+ Sign the binary specified by \fIinfile\fR.
+ 
+ .TP
+-\fB-\-detached\fR
++\fB-\-export\fR
+ When used with \fB-\-sign\fR, write the signature to \fIoutfile\fR.
+ 
+ .TP
+-\fB-\-in\fR=\fIinfile\fR
++\fB-\-infile\fR=\fIinfile\fR
+ When used with \fB-\-sign\fR, specify the input binary.
+ 
+ .TP
+-\fB-\-out\fR=\fIoutfile\fR
++\fB-\-outfile\fR=\fIoutfile\fR
+ When used with \fB-\-sign\fR, specify output file.  If \fB-\-detached\fR
+ is specified, this will be a DER-formatted signature.  Otherwise, the
+ output will be the signed PE binary.
+diff --git a/src/pesign.1 b/src/pesign.1
+index f69984e..56732d4 100644
+--- a/src/pesign.1
++++ b/src/pesign.1
+@@ -5,7 +5,8 @@ pesign \- command line tool for signing UEFI applications
+ .SH SYNOPSIS
+ \fBpesign\fR [--in=\fIinfile\fR | -i \fIinfile\fR]
+        [--out=\fIoutfile\fR | -o \fIoutfile\fR]
+-       [--token=\fItoken\fR | -t \fItoken\fR]
++       [--certdir=\fIcertdir/fR | -n \fIcertdir\fR]
++       [--nss-token=\fItoken\fR | -t \fItoken\fR]
+        [--certificate=\fInickname\fR | -c \fInickname\fR]
+        [--force | -f] [--sign | -s] [--hash | -h]
+        [--digest_type=\fIdigest\fR | -d \fIdigest\fR]
+@@ -13,6 +14,7 @@ pesign \- command line tool for signing UEFI applications
+        [--export-pubkey=\fIoutkey\fR | -K \fIoutkey\fR]
+        [--export-cert=\fIoutcert\fR | -C \fIoutcert\fR]
+        [--ascii-armor | -a] [--daemonize | -D] [--nofork | -N]
++       [--signature-number=\fIsignum\fR | -u \fIsignum\fR]
+ 
+ .SH DESCRIPTION
+ \fBpesign\fR is a command line tool for manipulating signatures and 
+@@ -28,7 +30,11 @@ Specify input binary.
+ Specify output binary.
+ 
+ .TP
+-\fB-\-token\fR=\fItoken\fR
++\fB-\-certdir\fR=\fIcertdir\fR
++Specify nss certificate database directory.
++
++.TP
++\fB-\-nss-token\fR=\fItoken\fR
+ Use the specified NSS token's certificate database.
+ 
+ .TP
+@@ -51,7 +57,8 @@ Display the cryptographic digest of the input binary on standard output.
+ .TP
+ \fB-\-digest_type\fR=\fIdigest\fR
+ Use the specified digest in hashing and signing operations. By default,
+-this value is "sha256".  Use "--digest=help" to list the available digests.
++this value is "sha256".  Use "--digest_type=help" to list the available
++digests.
+ 
+ .TP
+ \fB-\-show-signature\fR
+@@ -62,6 +69,10 @@ Show information about the signature of the input binary.
+ Remove the signature section from the binary.
+ 
+ .TP
++\fB-\-signature-number\fR=\fIsignum\fR
++Specify which signature to operate on.  This field is zero-indexed.
++
++.TP
+ \fB-\-export-pubkey\fR=\fIoutkey\fR
+ Export the public key specified by --certificate to \fIoutkey\fR
+ 
+-- 
+1.9.3
+

@@ -1,0 +1,8 @@
+[Unit]
+Description=Pesign signing daemon
+
+[Service]
+PrivateTmp=true
+Type=forking
+PIDFile=/var/run/pesign.pid
+ExecStart=/usr/bin/pesign --daemonize

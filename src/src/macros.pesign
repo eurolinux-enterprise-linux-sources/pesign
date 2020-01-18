@@ -1,0 +1,58 @@
+# macros for use with pesign
+#
+# this makes it possible to invoke your build as:
+# rpmbuild --define 'pe_signing_token test2' --define "pe_signing_cert signing key for test2" -ba shim.spec
+# and then in the spec do:
+# %pesign -s -i shim.orig -o shim.efi
+# And magically get the right thing.
+
+%__pesign_token %{nil}%{?pe_signing_token:-t "%{pe_signing_token}"}
+%__pesign_cert %{!?pe_signing_cert:-c "Red Hat Test Certificate"}%{?pe_signing_cert:-c "%{pe_signing_cert}"}
+
+%_pesign /usr/bin/pesign
+%_pesign_client /usr/bin/pesign-client
+
+# -i <input filename>
+# -o <output filename>
+# -C <output cert filename>
+# -e <output sattr filename>
+# -c <input certificate filename>	# rhel only
+# -n <input certificate name>		# rhel only
+# -a <input ca cert filename>		# rhel only
+# -s 					# perform signing
+%pesign(i:o:C:e:c:n:a:s)						\
+  if [ -x %{_pesign} -a "%{_target_cpu}" == "x86_64" ]; then		\
+    if [ "0%{?rhel}" -ge "7" ]; then					\
+      nss=$(mktemp -p $PWD -d)						\
+      echo > ${nss}/pwfile						\
+      certutil -N -d ${nss} -f ${nss}/pwfile				\
+      certutil -A -n "ca" -t "CT,C," -i %{-a*} -d ${nss}		\
+      certutil -A -n "signer" -t ",c," -i %{-c*} -d ${nss}		\
+      sattrs=$(mktemp -p $PWD --suffix=.der)				\
+      %{_pesign} %{-i} -E ${sattrs} --certdir ${nss} --force		\
+      rpm-sign --key "%{-n*}" --rsasign ${sattrs}			\
+      %{_pesign} -R ${sattrs}.sig -I ${sattrs} %{-i}			\\\
+                 --certdir ${nss} -c signer %{-o}			\
+      rm -rf ${sattrs} ${sattrs}.sig ${nss}				\
+    elif [ -S /var/run/pesign/socket ]; then				\
+      %{_pesign_client} -t "OpenSC Card (Fedora Signer)"		\\\
+                        -c "/CN=Fedora Secure Boot Signer"		\\\
+                        %{-i} %{-o} %{-e} %{-s} %{-C}			\
+    else								\
+      %{_pesign} %{__pesign_token} %{__pesign_cert}			\\\
+                 %{-i} %{-o} %{-e} %{-s} %{-C}				\
+    fi									\
+  else									\
+    if [ -n "%{-i*}" -a -n "%{-o*}" ]; then				\
+      mv %{-i*} %{-o*}							\
+    elif [ -n "%{-i*}" -a -n "%{-e*}" ]; then				\
+      touch %{-e*}							\
+    fi									\
+  fi									\
+  if [ ! -s %{-o} ]; then						\
+    if [ -e "%{-o*}" ]; then						\
+      rm -f %{-o*}							\
+    fi									\
+    exit 1								\
+  fi ;
+

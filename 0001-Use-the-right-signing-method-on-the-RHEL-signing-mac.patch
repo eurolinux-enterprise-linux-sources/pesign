@@ -1,0 +1,26 @@
+From 776e724687ebc2958ac6c78cd30e9d8b6a0c6eec Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 24 Oct 2013 15:22:13 -0400
+Subject: [PATCH] Use the right signing method on the RHEL signing macro.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/macros.pesign | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/macros.pesign b/src/macros.pesign
+index 7f6e6ef..143ef8e 100644
+--- a/src/macros.pesign
++++ b/src/macros.pesign
+@@ -30,7 +30,7 @@
+       certutil -A -n "signer" -t ",c," -i %{-c*} -d ${nss}		\
+       sattrs=$(mktemp -p $PWD --suffix=.der)				\
+       %{_pesign} %{-i} -E ${sattrs} --certdir ${nss} --force		\
+-      rpm-sign --key "%{-n*}" --rsasign ${sattrs}			\
++      rpm-sign --key "%{-n*}" --rsadgstsign ${sattrs}			\
+       %{_pesign} -R ${sattrs}.sig -I ${sattrs} %{-i}			\\\
+                  --certdir ${nss} -c signer %{-o}			\
+       rm -rf ${sattrs} ${sattrs}.sig ${nss}				\
+-- 
+1.8.3.1
+

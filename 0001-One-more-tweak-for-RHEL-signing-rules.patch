@@ -1,0 +1,28 @@
+From 44d896bec9124d42e2ca2035e46599c446640ba3 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 29 Oct 2013 11:27:31 -0400
+Subject: [PATCH] One more tweak for RHEL signing rules.
+
+It never ends.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/macros.pesign | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/macros.pesign b/src/macros.pesign
+index 143ef8e..7faa4a1 100644
+--- a/src/macros.pesign
++++ b/src/macros.pesign
+@@ -22,7 +22,7 @@
+ # -s 					# perform signing
+ %pesign(i:o:C:e:c:n:a:s)						\
+   if [ -x %{_pesign} -a "%{_target_cpu}" == "x86_64" ]; then		\
+-    if [ "0%{?rhel}" -ge "7" ]; then					\
++    if [ "0%{?rhel}" -ge "7" -a -f /usr/bin/rpm-sign ]; then		\
+       nss=$(mktemp -p $PWD -d)						\
+       echo > ${nss}/pwfile						\
+       certutil -N -d ${nss} -f ${nss}/pwfile				\
+-- 
+1.8.3.1
+
